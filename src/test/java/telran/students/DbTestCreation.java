@@ -107,4 +107,8 @@ public class DbTestCreation {
 	public Mark[] getStudentMarks(long id) {
 		return marks[(int) (id - 1)];
 	}
+	
+	public Student getStudent(long id) {
+		return students[(int) (id -1)];
+	}
 }
