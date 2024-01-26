@@ -14,4 +14,24 @@ public interface StudentsService {
 	Student removeStudent(long id);
 
 	List<Mark> getMarks(long id);
+
+	Student getStudentByPhone(String phoneNumber);
+
+	List<Student> getStudentsByPhonePrefix(String phonePrefix);
+
+	List<Student> getStudentsAllMarsGoodMarks(int thresholdScore);
+
+	List<Student> getStudentsFewMarks(int thresholdMarks);
+
+	// HW #74
+	/************************************************************************************/
+	// getting students who have at least one score of a given subject and all
+	// scores of that subject
+	// greater than or equal a given threshold
+	List<Student> getStudentsAllGoodMarksSubject(String subject, int thresholdScore);
+
+	/*********************************************************************************/
+	// getting students having number of marks in a closed range of the given values
+	// nMarks >= min && nMarks <= max
+	List<Student> getStudentsMarksAmountBetween(int min, int max);
 }
