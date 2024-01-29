@@ -1,7 +1,13 @@
 package telran.students.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
-
+import org.bson.Document;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +23,7 @@ import telran.students.repo.*;
 @RequiredArgsConstructor
 public class StudentsServiceImpl implements StudentsService {
 	final StudentRepo studentRepo;
+	final MongoTemplate mongoTemplate;
 
 	@Override
 	@Transactional
@@ -132,17 +139,68 @@ public class StudentsServiceImpl implements StudentsService {
 		if (!studentRepo.existsById(id)) {
 			throw new NotFoundException(String.format("student with id %d not found", id));
 		}
-		MarksOnly marksOnly = studentRepo.findByIdAndMarksSubject(id, subject);
-		List<Mark> marks = Collections.emptyList();
-		if (marksOnly != null) {
-			marks = marksOnly.getMarks();
-			log.debug("student %d doesn't have marks of subject {}", id, subject);
-		}
-		log.debug("marks: {}", marks);
-		return marks
+		MatchOperation matchStudent = Aggregation.match(Criteria.where("id").is(id));
+		UnwindOperation unwindOperation = Aggregation.unwind("marks");
+		MatchOperation matchMarksSubject = Aggregation.match(Criteria.where("marks.subject").is(subject));
+		ProjectionOperation projectionOperation = Aggregation.project("marks.score", "marks.date");
+		Aggregation pipeLine = Aggregation.newAggregation(matchStudent, unwindOperation, matchMarksSubject,
+				projectionOperation);
+		var aggregationResult = mongoTemplate.aggregate(pipeLine, StudentDoc.class, Document.class);
+		List<Document> listDocument = aggregationResult.getMappedResults();
+		log.debug("listDocuments: {}", listDocument);
+		List<Mark> result = listDocument
 				.stream()
-				.filter(m -> m.subject().equals(subject))
+				.map(d -> new Mark(subject,
+						d.getDate("date").toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+						d.getInteger("score")))
 				.toList();
+		log.debug("result: {}", result);
+		return result;
+	}
+
+	@Override
+	public List<NameAvgScore> getStudentAvgScoreGreater(int avgScoreThreshold) {
+		UnwindOperation unwindOperation = Aggregation.unwind("marks");
+		GroupOperation groupOperation = Aggregation.group("name").avg("marks.score").as("avgMark");
+		MatchOperation matchOperation = Aggregation.match(Criteria.where("avgMark").gt(avgScoreThreshold));
+		SortOperation sortOperation = Aggregation.sort(Direction.DESC, "avgMark");
+		Aggregation pipeLine = Aggregation.newAggregation(unwindOperation, groupOperation, matchOperation,
+				sortOperation);
+		List<NameAvgScore> result = mongoTemplate.aggregate(pipeLine, StudentDoc.class, Document.class)
+				.getMappedResults()
+				.stream()
+				.map(d -> new NameAvgScore(d.getString("_id"), d.getDouble("avgMark").intValue()))
+				.toList();
+		log.debug("result: {}", result);
+		return result;
+	}
+
+	@Override
+	public List<Mark> getStudentMarksAtDates(long id, LocalDate from, LocalDate to) {
+		// TODO
+		// returns list of Mark objects of the required student at the given dates
+		// Filtering and projection should be done at DB server
+		return null;
+	}
+
+	@Override
+	public List<String> getBestStudents(int nStudents) {
+		// TODO
+		// returns list of a given number of the best students
+		// Best students are the ones who have most scores greater than 80
+		return null;
+	}
+
+	@Override
+	public List<String> getWorstStudents(int nStudents) {
+		// TODO
+		// returns list of a given number of the worst students
+		// Worst students are the ones who have least sum's of all scores
+		// Students who have no scores at all should be considered as worst
+		// instead of GroupOperation to apply AggregationExpression (with
+		// AccumulatorOperators.Sum) and ProjectionOperation for adding new fields with
+		// computed values
+		return null;
 	}
 
 }
