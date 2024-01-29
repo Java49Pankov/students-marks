@@ -119,13 +119,19 @@ class StudentsServiceTests {
 
 	@Test
 	void getGoodStudentsSubjectTest() {
-		// TODO
+		List<Student> expected = List.of(dbCreation.getStudent(6));
+		List<Student> actual = studentsService.getStudentsAllGoodMarksSubject(DbTestCreation.SUBJECT_1, 90);
+		assertIterableEquals(expected, actual);
+		assertTrue(studentsService.getStudentsAllGoodMarksSubject(DbTestCreation.SUBJECT_2, 150).isEmpty());
 
 	}
 
 	@Test
 	void getStudentsMarksAmountBetween() {
-		// TODO
+		List<Student> expected = List.of(dbCreation.getStudent(3), dbCreation.getStudent(5));
+		List<Student> actual = studentsService.getStudentsMarksAmountBetween(2, 2);
+		assertIterableEquals(expected, actual);
+		assertTrue(studentsService.getStudentsMarksAmountBetween(5, 10).isEmpty());
 	}
 
 }
