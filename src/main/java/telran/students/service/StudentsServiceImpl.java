@@ -126,7 +126,23 @@ public class StudentsServiceImpl implements StudentsService {
 		List<IdNamePhone> students = studentRepo.findByRangeMarks(min, max);
 		return getStudents(students);
 	}
-	
-	
+
+	@Override
+	public List<Mark> getStudentSubjectMarks(long id, String subject) {
+		if (!studentRepo.existsById(id)) {
+			throw new NotFoundException(String.format("student with id %d not found", id));
+		}
+		MarksOnly marksOnly = studentRepo.findByIdAndMarksSubject(id, subject);
+		List<Mark> marks = Collections.emptyList();
+		if (marksOnly != null) {
+			marks = marksOnly.getMarks();
+			log.debug("student %d doesn't have marks of subject {}", id, subject);
+		}
+		log.debug("marks: {}", marks);
+		return marks
+				.stream()
+				.filter(m -> m.subject().equals(subject))
+				.toList();
+	}
 
 }

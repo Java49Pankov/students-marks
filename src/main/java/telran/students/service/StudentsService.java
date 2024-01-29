@@ -26,4 +26,6 @@ public interface StudentsService {
 	List<Student> getStudentsAllGoodMarksSubject(String subject, int thresholdScore);
 
 	List<Student> getStudentsMarksAmountBetween(int min, int max);
+
+	List<Mark> getStudentSubjectMarks(long id, String subject);
 }

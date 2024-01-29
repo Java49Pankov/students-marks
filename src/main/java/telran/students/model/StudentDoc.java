@@ -1,4 +1,4 @@
-package telran.students.model;
+ package telran.students.model;
 
 import java.util.*;
 
