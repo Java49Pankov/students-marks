@@ -70,16 +70,21 @@ public class DbTestCreation {
 			{ new Mark(SUBJECT_1, DATE_1, 80),
 					new Mark(SUBJECT_1, DATE_2, 90),
 					new Mark(SUBJECT_2, DATE_2, 70) },
+			
 			{ new Mark(SUBJECT_3, DATE_1, 70) },
+			
 			{ new Mark(SUBJECT_1, DATE_1, 80),
 					new Mark(SUBJECT_4, DATE_3, 70) },
+			
 			{ new Mark(SUBJECT_2, DATE_1, 100),
 					new Mark(SUBJECT_3, DATE_3, 90),
 					new Mark(SUBJECT_4, DATE_4, 90)
 			},
+			
 			{ new Mark(SUBJECT_1, DATE_1, 70),
 					new Mark(SUBJECT_3, DATE_3, 70),
 			},
+			
 			{ new Mark(SUBJECT_1, DATE_1, 100),
 					new Mark(SUBJECT_2, DATE_2, 100),
 					new Mark(SUBJECT_3, DATE_3, 100),

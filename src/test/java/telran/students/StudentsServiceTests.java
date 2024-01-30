@@ -156,16 +156,26 @@ class StudentsServiceTests {
 
 	@Test
 	void getStudentMarksAtDatesTest() {
-		// TODO
+		List<Mark> expected = List.of(new Mark(DbTestCreation.SUBJECT_1, DbTestCreation.DATE_2, 90),
+				new Mark(DbTestCreation.SUBJECT_2, DbTestCreation.DATE_2, 70));
+		List<Mark> actual = studentsService.getStudentMarksAtDates(1, DbTestCreation.DATE_2, DbTestCreation.DATE_3);
+		assertTrue(studentsService.getStudentMarksAtDates(1, DbTestCreation.DATE_3, DbTestCreation.DATE_4).isEmpty());
+		assertThrowsExactly(NotFoundException.class,
+				() -> studentsService.getStudentMarksAtDates(1000, DbTestCreation.DATE_1, DbTestCreation.DATE_2));
+		assertEquals(expected, actual);
 	}
 
 	@Test
 	void getBestStudentsTest() {
-		// TODO
+		List<String> expected = List.of(DbTestCreation.NAME_6, DbTestCreation.NAME_4);
+		List<String> actual = studentsService.getBestStudents(2);
+		assertIterableEquals(expected, actual);
 	}
 
 	@Test
 	void getWorstStudentsTest() {
-		// TODO
+		List<String> expected = List.of(DbTestCreation.NAME_7, DbTestCreation.NAME_2);
+		List<String> actual = studentsService.getWorstStudents(2);
+		assertIterableEquals(expected, actual);
 	}
 }
